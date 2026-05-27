@@ -1,0 +1,12 @@
+// Debug.xcconfig.sample
+// 이 파일을 복사해서 Debug.xcconfig 로 저장하고 값을 채우세요.
+// 실제 키가 들어간 Debug.xcconfig 는 .gitignore 처리됩니다.
+//
+// Release 빌드용으로는 Release.xcconfig 도 같은 형식으로 만들면 됩니다.
+
+// Supabase 프로젝트 URL 의 호스트 부분만 (https:// 없이)
+// 예) abcxyz123.supabase.co
+SUPABASE_URL = your-project-ref.supabase.co
+
+// Supabase anon public key (Project Settings > API)
+SUPABASE_ANON_KEY = your-anon-key-here

@@ -1,0 +1,32 @@
+# macOS
+.DS_Store
+
+# Xcode (디렉토리 이름과 무관하게 잡음)
+**/build/
+**/DerivedData/
+**/xcuserdata/
+**/*.xcuserdatad/
+**/*.xcuserstate
+
+# Swift Package Manager
+**/.swiftpm/
+**/Package.resolved
+
+# 🔐 실키 (xcconfig). .sample 만 커밋. 위치 어디든 잡음.
+**/Debug.xcconfig
+**/Release.xcconfig
+!**/Debug.xcconfig.sample
+!**/Release.xcconfig.sample
+
+# Next.js
+web-app/.next/
+web-app/node_modules/
+web-app/out/
+web-app/.vercel/
+web-app/.env
+web-app/.env.local
+web-app/.env.*.local
+
+# Supabase
+supabase/.branches/
+supabase/.temp/
