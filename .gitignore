@@ -30,3 +30,6 @@ web-app/.env.*.local
 # Supabase
 supabase/.branches/
 supabase/.temp/
+
+# 디자인 자산 워킹 폴더 (Xcode 가 인식하는 위치는 PhotoBooth/bundle/)
+/bundle/

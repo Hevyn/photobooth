@@ -27,6 +27,9 @@ final class CameraSession: NSObject, ObservableObject {
 
     @Published private(set) var state: State = .idle
     @Published private(set) var faceTracking: Bool = false  // 카메라 위에 "얼굴 인식 중" 작게 띄울 때 사용
+    @Published var activeFilter: Filter = Filter.all[0] {
+        didSet { applyFaceFilter() }
+    }
 
     let sceneView: ARSCNView = {
         let v = ARSCNView()
@@ -61,6 +64,7 @@ final class CameraSession: NSObject, ObservableObject {
     private var lastFramePresentationTime: CMTime = .zero
     private var currentResultContinuation: CheckedContinuation<CaptureResult, Error>?
     private var capturedPhoto: Data?
+    private weak var faceContainerNode: SCNNode?  // ARFaceAnchor 의 빈 컨테이너. 자식으로 face filter 부착
 
     // MARK: - Lifecycle
 
@@ -246,7 +250,8 @@ final class CameraSession: NSObject, ObservableObject {
     /// ARSCNView.snapshot() → CGImage → CVPixelBuffer 그리기.
     /// snapshot 은 메인스레드여야 함 → CADisplayLink 가 main 에서 돌므로 OK.
     private func drawSnapshotIntoPixelBuffer(pool: CVPixelBufferPool) -> CVPixelBuffer? {
-        let uiImage = sceneView.snapshot()
+        let raw = sceneView.snapshot()
+        let uiImage = compositeOverlay(on: raw, targetAspect: videoSize.width / videoSize.height)
         guard let cgImage = uiImage.cgImage else { return nil }
 
         var pb: CVPixelBuffer?
@@ -278,7 +283,8 @@ final class CameraSession: NSObject, ObservableObject {
     }
 
     private func snapshotJPEG() -> Data? {
-        let image = sceneView.snapshot()
+        let raw = sceneView.snapshot()
+        let image = compositeOverlay(on: raw, targetAspect: photoSize.width / photoSize.height)
         let format = UIGraphicsImageRendererFormat()
         format.scale = 1
         let renderer = UIGraphicsImageRenderer(size: photoSize, format: format)
@@ -333,7 +339,85 @@ extension CameraSession: ARSessionDelegate {
 extension CameraSession: ARSCNViewDelegate {
     nonisolated func renderer(_ renderer: SCNSceneRenderer, nodeFor anchor: ARAnchor) -> SCNNode? {
         guard anchor is ARFaceAnchor else { return nil }
-        // MVP: 더미 스티커 1개 (실 프레임 시스템 만들 때 여기를 데이터 모델 기반으로 교체)
-        return DummyStickerNode.makeNoseDot()
+        // 빈 컨테이너 반환. activeFilter 변경 시 자식 노드 교체 (applyFaceFilter)
+        let container = SCNNode()
+        Task { @MainActor in
+            self.faceContainerNode = container
+            self.applyFaceFilter()
+        }
+        return container
+    }
+}
+
+// MARK: - Filter application
+
+extension CameraSession {
+
+    /// activeFilter 의 face 카테고리를 ARFaceAnchor 컨테이너에 부착/교체.
+    /// overlay 카테고리는 별도로 snapshot/tick 의 2D 합성에서 처리.
+    private func applyFaceFilter() {
+        guard let container = faceContainerNode else { return }
+        container.childNodes.forEach { $0.removeFromParentNode() }
+        guard activeFilter.kind == .face,
+              let assetName = activeFilter.assetName,
+              let node = Self.makeFaceNode(assetName: assetName,
+                                           position: activeFilter.facePosition,
+                                           size: activeFilter.faceSize)
+        else { return }
+        container.addChildNode(node)
+    }
+
+    private static func makeFaceNode(assetName: String, position: SCNVec?, size: CGSize?) -> SCNNode? {
+        guard let url = Bundle.main.url(forResource: assetName, withExtension: "png"),
+              let img = UIImage(contentsOfFile: url.path)
+        else { return nil }
+        // PNG 의 실제 비율을 유지. Filter.faceSize 의 width 는 기준 너비로만 사용 (height 무시).
+        let baseWidth = size?.width ?? 0.16
+        let aspect = img.size.width / max(img.size.height, 1)
+        let planeWidth = baseWidth
+        let planeHeight = baseWidth / aspect
+        let plane = SCNPlane(width: planeWidth, height: planeHeight)
+        let material = SCNMaterial()
+        material.diffuse.contents = img
+        material.isDoubleSided = true
+        material.lightingModel = .constant
+        material.blendMode = .alpha
+        plane.materials = [material]
+        let node = SCNNode(geometry: plane)
+        let p = position ?? SCNVec(x: 0, y: 0, z: 0)
+        node.position = SCNVector3(p.x, p.y, p.z)
+        return node
+    }
+
+    /// sceneView 의 snapshot 위에 overlay PNG 를 2D 합성. overlay 필터가 아니면 원본 그대로.
+    /// targetAspect: 최종 결과물 (사진/영상) 비율. overlay 는 image 의 가운데 이 비율 영역에 그려져
+    /// 후속 crop 단계에서 정확히 맞아떨어짐 (snapshot 비율과 무관).
+    func compositeOverlay(on image: UIImage, targetAspect: CGFloat) -> UIImage {
+        guard activeFilter.kind == .overlay,
+              let assetName = activeFilter.assetName,
+              let url = Bundle.main.url(forResource: assetName, withExtension: "png"),
+              let overlay = UIImage(contentsOfFile: url.path)
+        else { return image }
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = image.scale
+        let renderer = UIGraphicsImageRenderer(size: image.size, format: format)
+        return renderer.image { _ in
+            image.draw(in: CGRect(origin: .zero, size: image.size))
+            let drawRect = Self.centeredRect(in: image.size, withAspect: targetAspect)
+            overlay.draw(in: drawRect)
+        }
+    }
+
+    private static func centeredRect(in size: CGSize, withAspect aspect: CGFloat) -> CGRect {
+        let imgAspect = size.width / size.height
+        if imgAspect > aspect {
+            let h = size.height
+            let w = h * aspect
+            return CGRect(x: (size.width - w) / 2, y: 0, width: w, height: h)
+        } else {
+            let w = size.width
+            let h = w / aspect
+            return CGRect(x: 0, y: (size.height - h) / 2, width: w, height: h)
+        }
     }
 }

@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2DA690952FC2C58000FBE164 /* DummyStickerNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA690892FC2C58000FBE164 /* DummyStickerNode.swift */; };
 		2DA690962FC2C58000FBE164 /* SupabaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA690922FC2C58000FBE164 /* SupabaseService.swift */; };
 		2DA690972FC2C58000FBE164 /* PhotoBoothApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA690852FC2C58000FBE164 /* PhotoBoothApp.swift */; };
 		2DA690982FC2C58000FBE164 /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA6908C2FC2C58000FBE164 /* CameraView.swift */; };
@@ -16,6 +15,11 @@
 		2DA6909B2FC2C58100FBE164 /* Debug.xcconfig.sample in Resources */ = {isa = PBXBuildFile; fileRef = 2DA690872FC2C58000FBE164 /* Debug.xcconfig.sample */; };
 		2DA6909E2FC2C89F00FBE164 /* Debug.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 2DA6909D2FC2C89A00FBE164 /* Debug.xcconfig */; };
 		2DA690E22FC2DC2600FBE164 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 2DA690E12FC2DC2600FBE164 /* Supabase */; };
+		2DA692242FC851F700FBE164 /* overlay_bike.png in Resources */ = {isa = PBXBuildFile; fileRef = 2DA692202FC851F700FBE164 /* overlay_bike.png */; };
+		2DA692252FC851F700FBE164 /* eye_glasses.png in Resources */ = {isa = PBXBuildFile; fileRef = 2DA6921F2FC851F700FBE164 /* eye_glasses.png */; };
+		2DA692262FC851F700FBE164 /* overlay_burger.png in Resources */ = {isa = PBXBuildFile; fileRef = 2DA692212FC851F700FBE164 /* overlay_burger.png */; };
+		2DA692272FC851F700FBE164 /* overlay_friend.png in Resources */ = {isa = PBXBuildFile; fileRef = 2DA692222FC851F700FBE164 /* overlay_friend.png */; };
+		2DA6922A2FC8529900FBE164 /* Filter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA692282FC8529900FBE164 /* Filter.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -41,12 +45,16 @@
 		2DA690722FC2C54400FBE164 /* PhotoBoothUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PhotoBoothUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2DA690852FC2C58000FBE164 /* PhotoBoothApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoBoothApp.swift; sourceTree = "<group>"; };
 		2DA690872FC2C58000FBE164 /* Debug.xcconfig.sample */ = {isa = PBXFileReference; lastKnownFileType = text; path = Debug.xcconfig.sample; sourceTree = "<group>"; };
-		2DA690892FC2C58000FBE164 /* DummyStickerNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DummyStickerNode.swift; sourceTree = "<group>"; };
 		2DA6908B2FC2C58000FBE164 /* CameraSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraSession.swift; sourceTree = "<group>"; };
 		2DA6908C2FC2C58000FBE164 /* CameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
 		2DA690922FC2C58000FBE164 /* SupabaseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseService.swift; sourceTree = "<group>"; };
 		2DA690932FC2C58000FBE164 /* UploadQueue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadQueue.swift; sourceTree = "<group>"; };
 		2DA6909D2FC2C89A00FBE164 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
+		2DA6921F2FC851F700FBE164 /* eye_glasses.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = eye_glasses.png; sourceTree = "<group>"; };
+		2DA692202FC851F700FBE164 /* overlay_bike.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = overlay_bike.png; sourceTree = "<group>"; };
+		2DA692212FC851F700FBE164 /* overlay_burger.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = overlay_burger.png; sourceTree = "<group>"; };
+		2DA692222FC851F700FBE164 /* overlay_friend.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = overlay_friend.png; sourceTree = "<group>"; };
+		2DA692282FC8529900FBE164 /* Filter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Filter.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -119,6 +127,7 @@
 				2DA690752FC2C54400FBE164 /* PhotoBoothUITests */,
 				2DA690E02FC2DC2600FBE164 /* Frameworks */,
 				2DA6905C2FC2C54300FBE164 /* Products */,
+				2DA692232FC851F700FBE164 /* bundle */,
 			);
 			sourceTree = "<group>";
 		};
@@ -152,7 +161,6 @@
 		2DA6908A2FC2C58000FBE164 /* ARStickers */ = {
 			isa = PBXGroup;
 			children = (
-				2DA690892FC2C58000FBE164 /* DummyStickerNode.swift */,
 			);
 			path = ARStickers;
 			sourceTree = "<group>";
@@ -164,13 +172,6 @@
 				2DA6908C2FC2C58000FBE164 /* CameraView.swift */,
 			);
 			path = Camera;
-			sourceTree = "<group>";
-		};
-		2DA6908E2FC2C58000FBE164 /* Filter */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Filter;
 			sourceTree = "<group>";
 		};
 		2DA6908F2FC2C58000FBE164 /* LocalQueue */ = {
@@ -185,8 +186,8 @@
 			children = (
 				2DA6908A2FC2C58000FBE164 /* ARStickers */,
 				2DA6908D2FC2C58000FBE164 /* Camera */,
-				2DA6908E2FC2C58000FBE164 /* Filter */,
 				2DA6908F2FC2C58000FBE164 /* LocalQueue */,
+				2DA692292FC8529900FBE164 /* Filters */,
 			);
 			path = Features;
 			sourceTree = "<group>";
@@ -212,6 +213,25 @@
 			children = (
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		2DA692232FC851F700FBE164 /* bundle */ = {
+			isa = PBXGroup;
+			children = (
+				2DA6921F2FC851F700FBE164 /* eye_glasses.png */,
+				2DA692202FC851F700FBE164 /* overlay_bike.png */,
+				2DA692212FC851F700FBE164 /* overlay_burger.png */,
+				2DA692222FC851F700FBE164 /* overlay_friend.png */,
+			);
+			path = bundle;
+			sourceTree = "<group>";
+		};
+		2DA692292FC8529900FBE164 /* Filters */ = {
+			isa = PBXGroup;
+			children = (
+				2DA692282FC8529900FBE164 /* Filter.swift */,
+			);
+			path = Filters;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -338,6 +358,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2DA692242FC851F700FBE164 /* overlay_bike.png in Resources */,
+				2DA692252FC851F700FBE164 /* eye_glasses.png in Resources */,
+				2DA692262FC851F700FBE164 /* overlay_burger.png in Resources */,
+				2DA692272FC851F700FBE164 /* overlay_friend.png in Resources */,
 				2DA6909B2FC2C58100FBE164 /* Debug.xcconfig.sample in Resources */,
 				2DA6909E2FC2C89F00FBE164 /* Debug.xcconfig in Resources */,
 			);
@@ -364,7 +388,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2DA690952FC2C58000FBE164 /* DummyStickerNode.swift in Sources */,
+				2DA6922A2FC8529900FBE164 /* Filter.swift in Sources */,
 				2DA690962FC2C58000FBE164 /* SupabaseService.swift in Sources */,
 				2DA690972FC2C58000FBE164 /* PhotoBoothApp.swift in Sources */,
 				2DA690982FC2C58000FBE164 /* CameraView.swift in Sources */,

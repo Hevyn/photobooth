@@ -16,6 +16,12 @@ struct CameraView: View {
             ARSceneViewRepresentable(view: camera.sceneView)
                 .ignoresSafeArea()
 
+            // 정적 오버레이 미리보기. 합성은 별도(CameraSession.compositeOverlay)로
+            // 사진/영상에 들어감 — 여기는 사용자에게 결과 미리 보여주는 용도.
+            overlayPreview
+                .allowsHitTesting(false)
+                .ignoresSafeArea()
+
             // ── 아래부터는 sceneView **바깥** — 영상에 안 들어감 ─────
             VStack {
                 HStack {
@@ -29,6 +35,8 @@ struct CameraView: View {
                     queueStatusCorner
                 }
                 Spacer()
+                filterStrip
+                    .padding(.bottom, 12)
                 shutterButton
                     .padding(.bottom, 40)
             }
@@ -52,6 +60,34 @@ struct CameraView: View {
     }
 
     // MARK: - Subviews
+
+    @ViewBuilder
+    private var overlayPreview: some View {
+        if camera.activeFilter.kind == .overlay,
+           let assetName = camera.activeFilter.assetName,
+           let url = Bundle.main.url(forResource: assetName, withExtension: "png"),
+           let img = UIImage(contentsOfFile: url.path) {
+            // PNG 비율 유지로 화면 안에 fit. 사진/영상의 4:3 영역과 동일 위치에 표시됨.
+            Image(uiImage: img)
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+        }
+    }
+
+    private var filterStrip: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 12) {
+                ForEach(Filter.all) { filter in
+                    FilterThumb(filter: filter, isSelected: filter.id == camera.activeFilter.id)
+                        .onTapGesture {
+                            camera.activeFilter = filter
+                        }
+                }
+            }
+            .padding(.horizontal, 8)
+        }
+        .frame(height: 88)
+    }
 
     private var shutterButton: some View {
         Button(action: { Task { await capture() } }) {
@@ -205,4 +241,48 @@ struct ARSceneViewRepresentable: UIViewRepresentable {
     let view: ARSCNView
     func makeUIView(context: Context) -> ARSCNView { view }
     func updateUIView(_ uiView: ARSCNView, context: Context) {}
+}
+
+private struct FilterThumb: View {
+    let filter: Filter
+    let isSelected: Bool
+
+    var body: some View {
+        VStack(spacing: 4) {
+            ZStack {
+                Circle()
+                    .fill(.white.opacity(0.18))
+                    .frame(width: 56, height: 56)
+                thumbContent
+            }
+            .overlay(
+                Circle()
+                    .stroke(isSelected ? Color.white : .clear, lineWidth: 3)
+            )
+            Text(filter.displayName)
+                .font(.system(size: 10, weight: .semibold))
+                .foregroundStyle(.white)
+                .shadow(color: .black.opacity(0.5), radius: 2)
+                .lineLimit(1)
+        }
+    }
+
+    @ViewBuilder
+    private var thumbContent: some View {
+        if filter.kind == .none {
+            Image(systemName: "circle.slash")
+                .font(.system(size: 22))
+                .foregroundStyle(.white)
+        } else if let assetName = filter.assetName,
+                  let url = Bundle.main.url(forResource: assetName, withExtension: "png"),
+                  let img = UIImage(contentsOfFile: url.path) {
+            Image(uiImage: img)
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 46, height: 46)
+        } else {
+            Image(systemName: "questionmark")
+                .foregroundStyle(.white)
+        }
+    }
 }
