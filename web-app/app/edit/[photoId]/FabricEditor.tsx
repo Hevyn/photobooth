@@ -27,6 +27,7 @@ export default function FabricEditor({ imageUrl }: Props) {
   const backgroundRef = useRef<FabricImage | null>(null)
   const [mode, setMode] = useState<Mode>('pen')
   const [penColor, setPenColor] = useState<string>(PEN_COLORS[0].value)
+  const [savedDataURL, setSavedDataURL] = useState<string | null>(null)
 
   // 캔버스 초기화 + 배경 사진 로드 (한 번만)
   // StrictMode dev 모드는 effect 를 두 번 호출 → fabricRef 가드로 1회 보장
@@ -136,16 +137,52 @@ export default function FabricEditor({ imageUrl }: Props) {
     canvas.requestRenderAll()
   }
 
+  // 캔버스 표시 사이즈(400) → 원본 사진 해상도(1440)로 export.
+  // 길게 눌러 저장하면 OS 가 이 고해상도 dataURL 을 사진 앱에 저장.
+  const prepareSave = () => {
+    const canvas = fabricRef.current
+    if (!canvas) return
+    canvas.discardActiveObject()
+    canvas.requestRenderAll()
+    const url = canvas.toDataURL({
+      format: 'png',
+      multiplier: 1440 / CANVAS_W,
+    })
+    setSavedDataURL(url)
+  }
+
   return (
     <div className="flex flex-col items-center gap-3">
-      {/* 캔버스 */}
+      {/* 캔버스 — fabric 이 직접 그릴 element. dispose 우려로 항상 mount, 위에 img 오버레이로 가림 */}
       <div
-        className="bg-white rounded-2xl shadow-md overflow-hidden"
+        className="bg-white rounded-2xl shadow-md overflow-hidden relative"
         style={{ width: CANVAS_W, height: CANVAS_H }}
       >
         <canvas ref={canvasElRef} width={CANVAS_W} height={CANVAS_H} />
+        {savedDataURL && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={savedDataURL}
+            alt="저장용 고해상도 미리보기"
+            className="absolute inset-0 w-full h-full object-contain bg-white"
+          />
+        )}
       </div>
 
+      {savedDataURL ? (
+        <>
+          <p className="text-sm text-pink-800 font-bold">
+            📱 위 사진을 길게 눌러 저장하세요
+          </p>
+          <button
+            onClick={() => setSavedDataURL(null)}
+            className="px-5 py-2 rounded-full bg-pink-100 text-pink-900 font-bold text-sm shadow-sm hover:bg-pink-200 transition"
+          >
+            ↩️ 다시 꾸미기
+          </button>
+        </>
+      ) : (
+      <>
       {/* 모드 토글 */}
       <div className="flex gap-2">
         <ToolBtn active={mode === 'pen'} onClick={() => setMode('pen')}>
@@ -208,6 +245,16 @@ export default function FabricEditor({ imageUrl }: Props) {
           전체 초기화
         </button>
       </div>
+
+      {/* 저장 준비 — 고해상도 dataURL 캡쳐 후 img 로 overlay */}
+      <button
+        onClick={prepareSave}
+        className="mt-2 px-6 py-2.5 rounded-full bg-pink-500 text-white font-bold shadow-md hover:bg-pink-600 transition"
+      >
+        ✨ 완성
+      </button>
+      </>
+      )}
     </div>
   )
 }
