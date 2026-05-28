@@ -45,7 +45,8 @@ final class CameraSession: NSObject, ObservableObject {
     private let recordVideoEnabled: Bool = true
 
     private let videoFPS: Int = 15
-    private let videoSize = CGSize(width: 720, height: 720)
+    private let videoSize = CGSize(width: 960, height: 720)   // 4:3 가로형
+    private let photoSize = CGSize(width: 1440, height: 1080) // 4:3 가로형, 영상보다 큼
     private let videoBitrate: Int = 2_000_000
     private let postShutterTail: TimeInterval = 0.3   // "찰칵" 후 추가 녹화
 
@@ -268,14 +269,9 @@ final class CameraSession: NSObject, ObservableObject {
                       | CGBitmapInfo.byteOrder32Little.rawValue
         ) else { return nil }
 
-        // 가운데 정사각 crop 으로 720x720 채우기
+        // 가운데 4:3 crop 으로 videoSize 채우기
         let imgSize = CGSize(width: cgImage.width, height: cgImage.height)
-        let side = min(imgSize.width, imgSize.height)
-        let srcRect = CGRect(
-            x: (imgSize.width - side) / 2,
-            y: (imgSize.height - side) / 2,
-            width: side, height: side
-        )
+        let srcRect = Self.centerCrop(in: imgSize, toAspectOf: videoSize)
         guard let cropped = cgImage.cropping(to: srcRect) else { return nil }
         ctx.draw(cropped, in: CGRect(origin: .zero, size: videoSize))
         return buffer
@@ -283,24 +279,36 @@ final class CameraSession: NSObject, ObservableObject {
 
     private func snapshotJPEG() -> Data? {
         let image = sceneView.snapshot()
-        // 사진은 영상보다 큰 1080x1080 으로 저장
-        let target = CGSize(width: 1080, height: 1080)
         let format = UIGraphicsImageRendererFormat()
         format.scale = 1
-        let renderer = UIGraphicsImageRenderer(size: target, format: format)
+        let renderer = UIGraphicsImageRenderer(size: photoSize, format: format)
         let rendered = renderer.image { _ in
-            let src = image.size
-            let side = min(src.width, src.height)
-            let crop = CGRect(
-                x: (src.width - side) / 2,
-                y: (src.height - side) / 2,
-                width: side, height: side
-            )
+            let crop = Self.centerCrop(in: image.size, toAspectOf: photoSize)
             if let cg = image.cgImage?.cropping(to: crop) {
-                UIImage(cgImage: cg).draw(in: CGRect(origin: .zero, size: target))
+                UIImage(cgImage: cg).draw(in: CGRect(origin: .zero, size: photoSize))
             }
         }
         return rendered.jpegData(compressionQuality: 0.9)
+    }
+
+    /// 원본 size 안에서 target 의 비율과 같은 가운데 영역을 잘라 반환.
+    private static func centerCrop(in src: CGSize, toAspectOf target: CGSize) -> CGRect {
+        let targetRatio = target.width / target.height
+        let srcRatio = src.width / src.height
+        let cropW: CGFloat
+        let cropH: CGFloat
+        if srcRatio > targetRatio {
+            cropH = src.height
+            cropW = cropH * targetRatio
+        } else {
+            cropW = src.width
+            cropH = cropW / targetRatio
+        }
+        return CGRect(
+            x: (src.width - cropW) / 2,
+            y: (src.height - cropH) / 2,
+            width: cropW, height: cropH
+        )
     }
 
     enum CaptureError: Error {

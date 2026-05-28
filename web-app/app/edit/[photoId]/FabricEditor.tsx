@@ -5,7 +5,9 @@ import { Canvas, FabricImage, IText, PencilBrush, Shadow } from 'fabric'
 
 type Mode = 'pen' | 'sticker'
 
-const CANVAS_SIZE = 360 // 폰 친화 표시 사이즈. 원본 사진 1080 은 export 시 multiplier 로 복원
+// 캔버스 표시 사이즈 (4:3 가로형). 원본 사진 1440×1080 은 export 시 multiplier 로 복원
+const CANVAS_W = 400
+const CANVAS_H = 300
 
 const PEN_COLORS = [
   { name: '핑크', value: '#ff70a6' },
@@ -32,29 +34,32 @@ export default function FabricEditor({ imageUrl }: Props) {
     if (!canvasElRef.current || fabricRef.current) return
 
     const canvas = new Canvas(canvasElRef.current, {
-      width: CANVAS_SIZE,
-      height: CANVAS_SIZE,
+      width: CANVAS_W,
+      height: CANVAS_H,
       backgroundColor: '#ffffff',
       // Retina 자동 확대 끄기 — 명확한 1:1 좌표. HiDPI 는 export 시 복원 (이슈 #3)
       enableRetinaScaling: false,
     })
     canvas.setDimensions(
-      { width: `${CANVAS_SIZE}px`, height: `${CANVAS_SIZE}px` },
+      { width: `${CANVAS_W}px`, height: `${CANVAS_H}px` },
       { cssOnly: true }
     )
     fabricRef.current = canvas
 
     FabricImage.fromURL(imageUrl, { crossOrigin: 'anonymous' }).then((img) => {
-      // fabric 의 실제 internal 좌표계 기준 (enableRetinaScaling 무관하게 자동 적응)
+      // aspect-fit: 캔버스 안에 꽉 차되 비율 유지. 비율 다르면 가운데 정렬 + 여백
       const cw = canvas.getWidth()
       const ch = canvas.getHeight()
-      const longer = Math.max(img.width ?? cw, img.height ?? ch, 1)
-      const scale = Math.min(cw, ch) / longer
+      const w = img.width ?? cw
+      const h = img.height ?? ch
+      const scale = Math.min(cw / w, ch / h)
+      const scaledW = w * scale
+      const scaledH = h * scale
       img.set({
         scaleX: scale,
         scaleY: scale,
-        left: 0,
-        top: 0,
+        left: (cw - scaledW) / 2,
+        top: (ch - scaledH) / 2,
         originX: 'left',
         originY: 'top',
         selectable: false,
@@ -98,8 +103,8 @@ export default function FabricEditor({ imageUrl }: Props) {
     const canvas = fabricRef.current
     if (!canvas) return
     const text = new IText(emoji, {
-      left: CANVAS_SIZE / 2,
-      top: CANVAS_SIZE / 2,
+      left: CANVAS_W / 2,
+      top: CANVAS_H / 2,
       fontSize: 60,
       originX: 'center',
       originY: 'center',
@@ -136,9 +141,9 @@ export default function FabricEditor({ imageUrl }: Props) {
       {/* 캔버스 */}
       <div
         className="bg-white rounded-2xl shadow-md overflow-hidden"
-        style={{ width: CANVAS_SIZE, height: CANVAS_SIZE }}
+        style={{ width: CANVAS_W, height: CANVAS_H }}
       >
-        <canvas ref={canvasElRef} width={CANVAS_SIZE} height={CANVAS_SIZE} />
+        <canvas ref={canvasElRef} width={CANVAS_W} height={CANVAS_H} />
       </div>
 
       {/* 모드 토글 */}
