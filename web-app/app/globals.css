@@ -1,26 +1,106 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Y2K 키치 팔레트 */
+  --color-pop-pink: #ff3d8d;
+  --color-pop-pink-soft: #ffc8dd;
+  --color-pop-yellow: #ffd400;
+  --color-pop-yellow-soft: #fff3a0;
+  --color-pop-sky: #5bc0eb;
+  --color-pop-sky-soft: #c5e9fd;
+  --color-pop-red: #e63946;
+  --color-pop-green: #a8e063;
+  --color-pop-cream: #fff8e0;
+  --color-pop-ink: #1a1a1a;
+
+  /* 폰트 (next/font 가 layout.tsx 에서 주입) */
+  --font-display: var(--font-bungee);
+  --font-body: var(--font-jua);
+
+  /* 의미별 alias (Tailwind utility 도 자동 생성) */
+  --color-background: var(--color-pop-cream);
+  --color-foreground: var(--color-pop-ink);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* 기본 body 톤: 크림 배경 + 잉크 텍스트 + 손글씨 폰트 */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-pop-cream);
+  color: var(--color-pop-ink);
+  font-family: var(--font-body), system-ui, sans-serif;
 }
+
+/* 디스플레이 폰트 utility */
+.font-display {
+  font-family: var(--font-display), system-ui, sans-serif;
+  letter-spacing: 0.02em;
+}
+.font-body {
+  font-family: var(--font-body), system-ui, sans-serif;
+}
+
+/* ───── 키치 배경 패턴 ─────────────────────────── */
+
+/* 도트 (ita.toys 톤): 크림 배경 + 알록 도트 4색 반복 */
+.bg-pattern-dots {
+  background-color: var(--color-pop-cream);
+  background-image:
+    radial-gradient(circle at 20px 20px, var(--color-pop-pink) 9px, transparent 10px),
+    radial-gradient(circle at 80px 20px, var(--color-pop-sky) 9px, transparent 10px),
+    radial-gradient(circle at 20px 80px, var(--color-pop-yellow) 9px, transparent 10px),
+    radial-gradient(circle at 80px 80px, var(--color-pop-green) 9px, transparent 10px);
+  background-size: 120px 120px;
+}
+
+/* 깅엄 격자 (Sanrio Town 톤): 하늘 격자 */
+.bg-pattern-gingham {
+  background-color: white;
+  background-image:
+    repeating-linear-gradient(0deg, transparent 0 24px, color-mix(in srgb, var(--color-pop-sky) 55%, transparent) 24px 48px),
+    repeating-linear-gradient(90deg, transparent 0 24px, color-mix(in srgb, var(--color-pop-sky) 55%, transparent) 24px 48px);
+}
+
+/* 하트 (nicola 잡지 톤): 핑크 배경 + 노랑 하트 */
+.bg-pattern-hearts {
+  background-color: var(--color-pop-pink-soft);
+  background-image:
+    radial-gradient(circle at 30px 30px, var(--color-pop-yellow) 6px, transparent 7px);
+  background-size: 60px 60px;
+}
+
+/* ───── 키치 컴포넌트 utility ────────────────────── */
+
+/* 스티커형 카드: 두꺼운 검정 보더 + chunky drop shadow */
+.sticker-card {
+  background: white;
+  border: 3px solid var(--color-pop-ink);
+  border-radius: 20px;
+  box-shadow: 6px 6px 0 0 var(--color-pop-ink);
+}
+
+/* 둥근 알약 보더 버튼 (Y2K 둥근 두꺼운 보더 톤) */
+.chunky-btn {
+  border: 3px solid var(--color-pop-ink);
+  border-radius: 9999px;
+  box-shadow: 4px 4px 0 0 var(--color-pop-ink);
+  font-family: var(--font-display), system-ui, sans-serif;
+  letter-spacing: 0.02em;
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+.chunky-btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 0 var(--color-pop-ink);
+}
+.chunky-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 0 var(--color-pop-ink);
+}
+.chunky-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 4px 4px 0 0 var(--color-pop-ink);
+}
+
+/* 살짝 기울어진 스티커 (붙인 느낌) */
+.tilt-left  { transform: rotate(-2.2deg); }
+.tilt-right { transform: rotate( 2.2deg); }

@@ -66,43 +66,44 @@ export default function DisplayPage() {
   const goNext = () => setCurrentIdx((i) => Math.min(total - 1, i + 1))
 
   return (
-    <main className="min-h-dvh bg-gradient-to-br from-pink-100 via-pink-50 to-yellow-100 flex flex-col items-center justify-center p-6 text-pink-900">
+    <main className="bg-pattern-gingham min-h-dvh flex flex-col items-center justify-center p-6">
       <header className="text-center mb-8">
-        <h1 className="text-3xl font-black tracking-tight">📸 PhotoBooth</h1>
-        <p className="text-sm mt-1 opacity-70">
+        <h1 className="font-display text-5xl md:text-6xl text-pop-pink drop-shadow-[3px_3px_0_var(--color-pop-ink)] tilt-left inline-block">
+          PHOTO&nbsp;BOOTH
+        </h1>
+        <p className="mt-3 text-lg font-bold">
           {!loaded
             ? '불러오는 중...'
             : total === 0
-              ? '아직 사진이 없어요. 첫 사진을 기다리는 중!'
-              : `📥 대기 ${total}장 · 현재 ${currentIdx + 1}번째`}
+              ? '아직 사진이 없어요. 첫 사진을 기다려요'
+              : `대기 ${total}장 · 현재 ${currentIdx + 1}번째`}
         </p>
       </header>
 
       {current ? (
-        <section className="bg-white rounded-3xl shadow-xl p-8 flex flex-col md:flex-row items-center gap-8 max-w-4xl w-full">
-          {/* 미리보기 */}
+        <section className="sticker-card p-6 md:p-8 flex flex-col md:flex-row items-center gap-8 max-w-4xl w-full">
           <div className="flex-1 flex justify-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={current.image_url}
               alt="사진 미리보기"
-              className="rounded-2xl shadow-md max-h-[60vh] object-contain"
+              className="rounded-2xl border-[3px] border-pop-ink shadow-[5px_5px_0_0_var(--color-pop-ink)] max-h-[60vh] object-contain tilt-right"
             />
           </div>
 
-          {/* QR */}
           <div className="flex flex-col items-center gap-4">
-            <div className="bg-white p-4 rounded-2xl border-4 border-pink-200">
+            <div className="bg-white p-4 rounded-2xl border-[3px] border-pop-ink shadow-[5px_5px_0_0_var(--color-pop-ink)] tilt-left">
               <QRCodeSVG
                 value={`${BASE_URL}/edit/${current.id}`}
                 size={240}
                 level="M"
                 bgColor="#ffffff"
-                fgColor="#1f1f1f"
+                fgColor="#1a1a1a"
               />
             </div>
-            <p className="text-sm font-semibold text-pink-700">
-              📱 QR 을 스캔하면 꾸미기 페이지로 이동해요
+            <p className="font-display text-base text-pop-ink text-center leading-tight">
+              SCAN&nbsp;ME!<br />
+              <span className="font-body font-bold text-sm">QR 을 스캔하면 꾸미기로</span>
             </p>
             <p className="text-[10px] font-mono opacity-40 select-all">
               id: {current.id}
@@ -110,33 +111,33 @@ export default function DisplayPage() {
           </div>
         </section>
       ) : loaded ? (
-        <section className="bg-white/60 rounded-3xl p-12 text-center text-pink-700">
-          첫 촬영을 시작해보세요!
+        <section className="sticker-card p-12 text-center">
+          <p className="font-display text-2xl text-pop-pink">FIRST&nbsp;SHOT!</p>
+          <p className="font-bold mt-2">첫 촬영을 시작해보세요</p>
         </section>
       ) : null}
 
-      {/* 이전/다음 */}
       {total > 0 && (
         <nav className="mt-8 flex gap-4">
           <button
             onClick={goPrev}
             disabled={currentIdx === 0}
-            className="px-6 py-3 rounded-full bg-pink-400 text-white font-bold shadow-md hover:bg-pink-500 disabled:opacity-30 disabled:cursor-not-allowed transition"
+            className="chunky-btn bg-pop-yellow text-pop-ink px-7 py-3 text-lg"
           >
-            ◀ 이전
+            PREV
           </button>
           <button
             onClick={goNext}
             disabled={currentIdx >= total - 1}
-            className="px-6 py-3 rounded-full bg-pink-400 text-white font-bold shadow-md hover:bg-pink-500 disabled:opacity-30 disabled:cursor-not-allowed transition"
+            className="chunky-btn bg-pop-pink text-white px-7 py-3 text-lg"
           >
-            다음 ▶
+            NEXT
           </button>
         </nav>
       )}
 
-      <footer className="mt-10 text-xs opacity-60">
-        📷 사진과 QR 은 24시간 후 자동으로 삭제됩니다
+      <footer className="mt-10 text-sm font-bold opacity-70">
+        사진과 QR 은 24시간 후 자동으로 삭제됩니다
       </footer>
     </main>
   )

@@ -1,15 +1,22 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Bungee, Jua } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+};
+
+const bungee = Bungee({
+  weight: "400",
   subsets: ["latin"],
+  variable: "--font-bungee",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const jua = Jua({
+  weight: "400",
   subsets: ["latin"],
+  variable: "--font-jua",
 });
 
 export const metadata: Metadata = {
@@ -25,9 +32,9 @@ export default function RootLayout({
   return (
     <html
       lang="ko"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${bungee.variable} ${jua.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col font-body">{children}</body>
     </html>
   );
 }

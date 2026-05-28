@@ -48,14 +48,17 @@ export default function EditPage() {
   }, [photoId])
 
   if (status === 'loading') {
-    return <Centered>📷 사진을 불러오고 있어요...</Centered>
+    return <Centered>사진을 불러오고 있어요...</Centered>
   }
 
   if (status === 'not_found') {
     return (
       <Centered>
-        <h1 className="text-2xl font-black mb-2">이 링크의 사진은 이미 사라졌어요</h1>
-        <p className="text-sm opacity-70">24시간이 지났거나, 다른 QR 일 수 있어요.</p>
+        <h1 className="font-display text-3xl text-pop-pink mb-3 drop-shadow-[2px_2px_0_var(--color-pop-ink)]">
+          OOPS!
+        </h1>
+        <p className="text-lg font-bold">이 링크의 사진은 이미 사라졌어요</p>
+        <p className="text-sm mt-1 opacity-70">24시간이 지났거나, 다른 QR 일 수 있어요</p>
       </Centered>
     )
   }
@@ -63,48 +66,51 @@ export default function EditPage() {
   if (status === 'error') {
     return (
       <Centered>
-        <h1 className="text-2xl font-black mb-2">잠시 후 다시 시도해주세요</h1>
-        <p className="text-sm opacity-70">사진을 불러오는 중 문제가 있었어요.</p>
+        <h1 className="font-display text-3xl text-pop-pink mb-3 drop-shadow-[2px_2px_0_var(--color-pop-ink)]">
+          TRY&nbsp;AGAIN
+        </h1>
+        <p className="text-lg font-bold">잠시 후 다시 시도해주세요</p>
+        <p className="text-sm mt-1 opacity-70">사진을 불러오는 중 문제가 있었어요</p>
       </Centered>
     )
   }
 
   return (
-    <main className="min-h-dvh bg-gradient-to-br from-pink-100 via-pink-50 to-yellow-100 p-4 text-pink-900">
-      <header className="text-center mb-6">
-        <h1 className="text-2xl font-black tracking-tight">✨ 사진 꾸미기</h1>
-        <p className="text-xs mt-1 opacity-60">아래 사진을 꾸민 뒤 길게 눌러 저장하세요</p>
+    <main className="bg-pattern-dots min-h-dvh p-4">
+      <header className="text-center mb-6 mt-2">
+        <h1 className="font-display text-4xl text-pop-pink drop-shadow-[3px_3px_0_var(--color-pop-ink)] tilt-left inline-block">
+          DECORATE!
+        </h1>
+        <p className="mt-2 text-base font-bold">아래 사진을 꾸민 뒤 완성을 눌러요</p>
       </header>
 
-      {/* 사진 꾸미기 캔버스 */}
       <section className="mb-4 max-w-md mx-auto">
         <FabricEditor imageUrl={photo!.image_url} />
       </section>
 
-      {/* 영상 영역 */}
       {photo!.video_url && (
-        <section className="bg-white rounded-3xl shadow-xl p-4 mb-4 max-w-md mx-auto flex flex-col items-center gap-3">
+        <section className="sticker-card p-4 mb-4 max-w-md mx-auto flex flex-col items-center gap-3">
           <video
             src={photo!.video_url}
             controls
             playsInline
-            className="w-full rounded-2xl"
+            className="w-full rounded-2xl border-[3px] border-pop-ink"
           />
           <a
             href={`${photo!.video_url}${photo!.video_url.includes('?') ? '&' : '?'}download=photobooth_${photoId.slice(0, 8)}.mp4`}
             download={`photobooth_${photoId.slice(0, 8)}.mp4`}
-            className="px-5 py-2 rounded-full bg-pink-500 text-white font-bold text-sm shadow-md hover:bg-pink-600 transition"
+            className="chunky-btn bg-pop-sky text-pop-ink px-6 py-2.5 text-base inline-block"
           >
-            📥 영상 저장
+            SAVE&nbsp;VIDEO
           </a>
-          <p className="text-[10px] text-pink-700 opacity-80 text-center max-w-xs">
+          <p className="text-xs font-bold text-pop-ink/70 text-center max-w-xs">
             폰의 다운로드 폴더 (파일 앱) 에 저장돼요
           </p>
         </section>
       )}
 
-      <footer className="mt-6 text-xs opacity-60 text-center">
-        📷 사진과 QR 은 24시간 후 자동으로 삭제됩니다
+      <footer className="mt-6 text-sm font-bold opacity-70 text-center pb-4">
+        사진과 QR 은 24시간 후 자동으로 삭제됩니다
       </footer>
     </main>
   )
@@ -112,8 +118,8 @@ export default function EditPage() {
 
 function Centered({ children }: { children: React.ReactNode }) {
   return (
-    <main className="min-h-dvh bg-gradient-to-br from-pink-100 via-pink-50 to-yellow-100 flex flex-col items-center justify-center p-6 text-pink-900 text-center">
-      {children}
+    <main className="bg-pattern-dots min-h-dvh flex flex-col items-center justify-center p-6 text-center">
+      <div className="sticker-card px-8 py-10 max-w-md">{children}</div>
     </main>
   )
 }

@@ -23,6 +23,7 @@ type Props = {
 
 export default function FabricEditor({ imageUrl }: Props) {
   const canvasElRef = useRef<HTMLCanvasElement | null>(null)
+  const wrapperRef = useRef<HTMLDivElement | null>(null)
   const fabricRef = useRef<Canvas | null>(null)
   const backgroundRef = useRef<FabricImage | null>(null)
   const [mode, setMode] = useState<Mode>('pen')
@@ -41,10 +42,25 @@ export default function FabricEditor({ imageUrl }: Props) {
       // Retina 자동 확대 끄기 — 명확한 1:1 좌표. HiDPI 는 export 시 복원 (이슈 #3)
       enableRetinaScaling: false,
     })
-    canvas.setDimensions(
-      { width: `${CANVAS_W}px`, height: `${CANVAS_H}px` },
-      { cssOnly: true }
-    )
+    // CSS 사이즈는 외부 wrapper 폭에 맞춰 동적으로 (모바일 overflow 방지).
+    // internal 좌표는 CANVAS_W×CANVAS_H 그대로 → fabric 이 좌표 자동 매핑.
+    // 주의: canvasElRef.current.parentElement 는 fabric 이 만든 canvas-container 라
+    // 거기 폭은 backing pixel 고정 → 반드시 우리가 박은 wrapperRef 를 관찰해야 한다.
+    const syncCssSize = () => {
+      const w = wrapperRef.current
+      if (!w) return
+      const cssW = Math.min(w.clientWidth, CANVAS_W)
+      const cssH = cssW * (CANVAS_H / CANVAS_W)
+      canvas.setDimensions(
+        { width: `${cssW}px`, height: `${cssH}px` },
+        { cssOnly: true }
+      )
+    }
+    syncCssSize()
+    const ro = new ResizeObserver(syncCssSize)
+    if (wrapperRef.current) {
+      ro.observe(wrapperRef.current)
+    }
     fabricRef.current = canvas
 
     FabricImage.fromURL(imageUrl, { crossOrigin: 'anonymous' }).then((img) => {
@@ -152,13 +168,22 @@ export default function FabricEditor({ imageUrl }: Props) {
   }
 
   return (
-    <div className="flex flex-col items-center gap-3">
-      {/* 캔버스 — fabric 이 직접 그릴 element. dispose 우려로 항상 mount, 위에 img 오버레이로 가림 */}
+    <div className="sticker-card p-4 flex flex-col items-center gap-4 w-full">
+      {/* 캔버스 — 부모 폭에 맞춰 반응형. internal 좌표는 CANVAS_W×H 그대로 */}
       <div
-        className="bg-white rounded-2xl shadow-md overflow-hidden relative"
-        style={{ width: CANVAS_W, height: CANVAS_H }}
+        ref={wrapperRef}
+        className="rounded-2xl border-[3px] border-pop-ink overflow-hidden relative bg-white w-full"
+        style={{
+          maxWidth: CANVAS_W,
+          aspectRatio: `${CANVAS_W} / ${CANVAS_H}`,
+        }}
       >
-        <canvas ref={canvasElRef} width={CANVAS_W} height={CANVAS_H} />
+        <canvas
+          ref={canvasElRef}
+          width={CANVAS_W}
+          height={CANVAS_H}
+          className="block"
+        />
         {savedDataURL && (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -171,58 +196,57 @@ export default function FabricEditor({ imageUrl }: Props) {
 
       {savedDataURL ? (
         <>
-          <p className="text-sm text-pink-800 font-bold">
-            📱 위 사진을 길게 눌러 저장하세요
+          <p className="text-base font-bold text-pop-ink">
+            위 사진을 길게 눌러 저장하세요
           </p>
           <button
             onClick={() => setSavedDataURL(null)}
-            className="px-5 py-2 rounded-full bg-pink-100 text-pink-900 font-bold text-sm shadow-sm hover:bg-pink-200 transition"
+            className="chunky-btn bg-pop-yellow text-pop-ink px-6 py-2 text-base"
           >
-            ↩️ 다시 꾸미기
+            BACK
           </button>
         </>
       ) : (
       <>
       {/* 모드 토글 */}
-      <div className="flex gap-2">
+      <div className="flex gap-3">
         <ToolBtn active={mode === 'pen'} onClick={() => setMode('pen')}>
-          ✏️ 펜
+          PEN
         </ToolBtn>
         <ToolBtn active={mode === 'sticker'} onClick={() => setMode('sticker')}>
-          ✨ 스티커
+          STICKER
         </ToolBtn>
       </div>
 
       {/* 펜 색 선택 */}
       {mode === 'pen' && (
-        <div className="flex gap-2 items-center">
+        <div className="flex gap-3 items-center">
           {PEN_COLORS.map((c) => (
             <button
               key={c.value}
               onClick={() => setPenColor(c.value)}
               aria-label={c.name}
-              className={`w-9 h-9 rounded-full border-2 transition ${
-                penColor === c.value
-                  ? 'border-pink-900 scale-110'
-                  : 'border-white opacity-70'
-              }`}
+              className="w-10 h-10 rounded-full border-[3px] border-pop-ink transition"
               style={{
                 backgroundColor: c.value,
-                boxShadow: `0 0 12px ${c.value}`,
+                transform: penColor === c.value ? 'scale(1.15)' : 'scale(1)',
+                boxShadow: penColor === c.value
+                  ? '3px 3px 0 0 var(--color-pop-ink)'
+                  : '2px 2px 0 0 var(--color-pop-ink)',
               }}
             />
           ))}
         </div>
       )}
 
-      {/* 이모지 스티커 */}
+      {/* 이모지 스티커 (기능은 이모지 그대로 유지) */}
       {mode === 'sticker' && (
         <div className="flex gap-2">
           {STICKERS.map((s) => (
             <button
               key={s}
               onClick={() => addSticker(s)}
-              className="w-11 h-11 text-2xl bg-white rounded-full shadow-sm hover:scale-110 transition"
+              className="w-12 h-12 text-2xl bg-white rounded-full border-[3px] border-pop-ink shadow-[3px_3px_0_0_var(--color-pop-ink)] hover:scale-110 transition"
             >
               {s}
             </button>
@@ -234,13 +258,13 @@ export default function FabricEditor({ imageUrl }: Props) {
       <div className="flex gap-2 mt-1">
         <button
           onClick={deleteSelected}
-          className="px-3 py-1.5 text-xs rounded-full bg-pink-200 text-pink-900 font-semibold hover:bg-pink-300 transition"
+          className="chunky-btn bg-white text-pop-ink px-4 py-1.5 text-xs"
         >
           선택 지우기
         </button>
         <button
           onClick={clearAll}
-          className="px-3 py-1.5 text-xs rounded-full bg-pink-200 text-pink-900 font-semibold hover:bg-pink-300 transition"
+          className="chunky-btn bg-white text-pop-ink px-4 py-1.5 text-xs"
         >
           전체 초기화
         </button>
@@ -249,9 +273,9 @@ export default function FabricEditor({ imageUrl }: Props) {
       {/* 저장 준비 — 고해상도 dataURL 캡쳐 후 img 로 overlay */}
       <button
         onClick={prepareSave}
-        className="mt-2 px-6 py-2.5 rounded-full bg-pink-500 text-white font-bold shadow-md hover:bg-pink-600 transition"
+        className="chunky-btn bg-pop-pink text-white px-8 py-3 text-xl mt-1"
       >
-        ✨ 완성
+        DONE!
       </button>
       </>
       )}
@@ -271,10 +295,8 @@ function ToolBtn({
   return (
     <button
       onClick={onClick}
-      className={`px-4 py-2 rounded-full text-sm font-bold transition shadow-sm ${
-        active
-          ? 'bg-pink-500 text-white scale-105'
-          : 'bg-white text-pink-700 hover:bg-pink-50'
+      className={`chunky-btn px-5 py-2 text-base ${
+        active ? 'bg-pop-pink text-white scale-105' : 'bg-white text-pop-ink'
       }`}
     >
       {children}
