@@ -1,7 +1,11 @@
 'use client'
 
 import { use, useEffect, useState } from 'react'
+import dynamic from 'next/dynamic'
 import { supabase, type Photo } from '@/lib/supabase/client'
+
+// Fabric.js 는 브라우저 전용 (window/document 사용) — SSR 차단
+const FabricEditor = dynamic(() => import('./FabricEditor'), { ssr: false })
 
 type Status = 'loading' | 'not_found' | 'error' | 'ready'
 
@@ -65,10 +69,9 @@ export default function EditPage(props: PageProps<'/edit/[photoId]'>) {
         <p className="text-xs mt-1 opacity-60">아래 사진을 꾸민 뒤 길게 눌러 저장하세요</p>
       </header>
 
-      {/* 사진 영역 — 이슈 #2 에서 Fabric.js 캔버스로 교체 */}
-      <section className="bg-white rounded-3xl shadow-xl p-4 mb-4 max-w-md mx-auto">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={photo!.image_url} alt="사진" className="w-full rounded-2xl" />
+      {/* 사진 꾸미기 캔버스 */}
+      <section className="mb-4 max-w-md mx-auto">
+        <FabricEditor imageUrl={photo!.image_url} />
       </section>
 
       {/* 영상 영역 — 이슈 #3 에서 안내 카피 추가 */}
