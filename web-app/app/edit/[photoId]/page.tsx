@@ -1,6 +1,7 @@
 'use client'
 
-import { use, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useParams } from 'next/navigation'
 import dynamic from 'next/dynamic'
 import { supabase, type Photo } from '@/lib/supabase/client'
 
@@ -12,8 +13,9 @@ type Status = 'loading' | 'not_found' | 'error' | 'ready'
 // photoId 가 UUID 형식이 아니면 DB 조회 전에 not_found 로 단락
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
-export default function EditPage(props: PageProps<'/edit/[photoId]'>) {
-  const { photoId } = use(props.params)
+export default function EditPage() {
+  const params = useParams<{ photoId: string }>()
+  const photoId = params?.photoId ?? ''
   const [photo, setPhoto] = useState<Photo | null>(null)
   const [status, setStatus] = useState<Status>('loading')
 
@@ -22,12 +24,13 @@ export default function EditPage(props: PageProps<'/edit/[photoId]'>) {
       setStatus('not_found')
       return
     }
-    supabase
-      .from('photos')
-      .select('*')
-      .eq('id', photoId)
-      .maybeSingle()
-      .then(({ data, error }) => {
+    void (async () => {
+      try {
+        const { data, error } = await supabase
+          .from('photos')
+          .select('*')
+          .eq('id', photoId)
+          .maybeSingle()
         if (error) {
           console.error('[edit] fetch failed:', error)
           setStatus('error')
@@ -37,7 +40,11 @@ export default function EditPage(props: PageProps<'/edit/[photoId]'>) {
           setPhoto(data as Photo)
           setStatus('ready')
         }
-      })
+      } catch (e) {
+        console.error('[edit] fetch threw:', e)
+        setStatus('error')
+      }
+    })()
   }, [photoId])
 
   if (status === 'loading') {
@@ -74,15 +81,25 @@ export default function EditPage(props: PageProps<'/edit/[photoId]'>) {
         <FabricEditor imageUrl={photo!.image_url} />
       </section>
 
-      {/* 영상 영역 — 이슈 #3 에서 안내 카피 추가 */}
+      {/* 영상 영역 */}
       {photo!.video_url && (
-        <section className="bg-white rounded-3xl shadow-xl p-4 mb-4 max-w-md mx-auto">
+        <section className="bg-white rounded-3xl shadow-xl p-4 mb-4 max-w-md mx-auto flex flex-col items-center gap-3">
           <video
             src={photo!.video_url}
             controls
             playsInline
             className="w-full rounded-2xl"
           />
+          <a
+            href={`${photo!.video_url}${photo!.video_url.includes('?') ? '&' : '?'}download=photobooth_${photoId.slice(0, 8)}.mp4`}
+            download={`photobooth_${photoId.slice(0, 8)}.mp4`}
+            className="px-5 py-2 rounded-full bg-pink-500 text-white font-bold text-sm shadow-md hover:bg-pink-600 transition"
+          >
+            📥 영상 저장
+          </a>
+          <p className="text-[10px] text-pink-700 opacity-80 text-center max-w-xs">
+            폰의 다운로드 폴더 (파일 앱) 에 저장돼요
+          </p>
         </section>
       )}
 
