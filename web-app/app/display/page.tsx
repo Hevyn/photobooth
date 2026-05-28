@@ -104,6 +104,9 @@ export default function DisplayPage() {
             <p className="text-sm font-semibold text-pink-700">
               📱 QR 을 스캔하면 꾸미기 페이지로 이동해요
             </p>
+            <p className="text-[10px] font-mono opacity-40 select-all">
+              id: {current.id}
+            </p>
           </div>
         </section>
       ) : loaded ? (
