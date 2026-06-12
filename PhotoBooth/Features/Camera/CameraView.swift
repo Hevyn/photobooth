@@ -1,5 +1,9 @@
 import SwiftUI
 import ARKit
+import CoreImage
+import CoreImage.CIFilterBuiltins
+
+private let kBaseURL = "https://saewoo-v-o3o-v.vercel.app"
 
 struct CameraView: View {
 
@@ -9,6 +13,7 @@ struct CameraView: View {
     @State private var stage: UploadStage? = nil
     @State private var queueCount: Int = 0
     @State private var showFailureBanner: Bool = false
+    @State private var qrPhotoId: String? = nil   // 업로드 성공 후 표시할 QR 의 photoId
 
     var body: some View {
         ZStack {
@@ -45,6 +50,7 @@ struct CameraView: View {
             countdownOverlay
             stageBanner
             failureBanner
+            qrOverlay
         }
         .background(.black)
         .onAppear {
@@ -96,8 +102,61 @@ struct CameraView: View {
                 Circle().fill(.white).frame(width: 76, height: 76)
             }
         }
-        .disabled(camera.state != .idle || stage != nil)
-        .opacity(camera.state == .idle && stage == nil ? 1 : 0.5)
+        .disabled(camera.state != .idle || stage != nil || qrPhotoId != nil)
+        .opacity(camera.state == .idle && stage == nil && qrPhotoId == nil ? 1 : 0.5)
+    }
+
+    // MARK: - QR Overlay
+
+    @ViewBuilder
+    private var qrOverlay: some View {
+        if let photoId = qrPhotoId {
+            ZStack {
+                Color.black.opacity(0.75).ignoresSafeArea()
+                VStack(spacing: 24) {
+                    Text("QR을 스캔해주세요♡")
+                        .font(.title.bold())
+                        .foregroundStyle(.white)
+                    if let qr = Self.makeQRCode(from: "\(kBaseURL)/edit/\(photoId)") {
+                        Image(uiImage: qr)
+                            .interpolation(.none)
+                            .resizable()
+                            .frame(width: 320, height: 320)
+                            .padding(16)
+                            .background(.white)
+                            .cornerRadius(16)
+                    }
+                    Text("감사합니다 - 새우 -")
+                        .font(.headline)
+                        .foregroundStyle(.white.opacity(0.85))
+                    Button {
+                        withAnimation { qrPhotoId = nil }
+                    } label: {
+                        Text("확인")
+                            .font(.title3.bold())
+                            .padding(.horizontal, 40).padding(.vertical, 14)
+                            .background(Color.white, in: Capsule())
+                            .foregroundStyle(.black)
+                    }
+                    .padding(.top, 8)
+                }
+            }
+            .transition(.opacity)
+        }
+    }
+
+    /// QR 코드 PNG 생성 (Core Image 의 CIQRCodeGenerator)
+    private static func makeQRCode(from text: String) -> UIImage? {
+        let data = Data(text.utf8)
+        let filter = CIFilter.qrCodeGenerator()
+        filter.message = data
+        filter.correctionLevel = "M"
+        guard let outputImage = filter.outputImage else { return nil }
+        // 픽셀 깨짐 없게 큰 사이즈로 확대 (interpolation none 과 함께)
+        let scaled = outputImage.transformed(by: CGAffineTransform(scaleX: 10, y: 10))
+        let context = CIContext()
+        guard let cg = context.createCGImage(scaled, from: scaled.extent) else { return nil }
+        return UIImage(cgImage: cg)
     }
 
     @ViewBuilder
@@ -188,7 +247,10 @@ struct CameraView: View {
                 switch s {
                 case .succeeded:
                     await MainActor.run {
-                        withAnimation { self.stage = nil }
+                        withAnimation {
+                            self.stage = nil
+                            self.qrPhotoId = job.id.uuidString
+                        }
                     }
                     queueCount = await queue.pendingCount
                 case .failed:
