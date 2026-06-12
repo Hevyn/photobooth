@@ -76,11 +76,14 @@ export default function EditPage() {
   }
 
   return (
-    <main className="bg-pattern-dots min-h-dvh p-4">
-      <header className="text-center mb-6 mt-2">
-        <h1 className="font-display text-4xl text-pop-pink drop-shadow-[3px_3px_0_var(--color-pop-ink)] tilt-left inline-block">
-          DECORATE!
-        </h1>
+    <main className="min-h-dvh p-4">
+      <header className="text-center mb-6 mt-2 flex flex-col items-center">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/decorate.png"
+          alt="SAEWOO"
+          className="w-48 md:w-56 h-auto tilt-left"
+        />
         <p className="mt-2 text-base font-bold">사진을 꾸며봐요! 저장하고 싶으면 완성을 눌러주세요♡</p>
       </header>
 
@@ -118,7 +121,7 @@ export default function EditPage() {
 
 function Centered({ children }: { children: React.ReactNode }) {
   return (
-    <main className="bg-pattern-dots min-h-dvh flex flex-col items-center justify-center p-6 text-center">
+    <main className="min-h-dvh flex flex-col items-center justify-center p-6 text-center">
       <div className="sticker-card px-8 py-10 max-w-md">{children}</div>
     </main>
   )
