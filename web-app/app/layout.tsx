@@ -8,8 +8,8 @@ const meongi = localFont({
   display: "swap",
 });
 
-const mondangbunfil = localFont({
-  src: "../public/fonts/Mondangbunfil.otf",
+const monoplex = localFont({
+  src: "../public/fonts/MonoplexKR-Italic.ttf",
   variable: "--font-jua",
   display: "swap",
 });
@@ -32,7 +32,7 @@ export default function RootLayout({
   return (
     <html
       lang="ko"
-      className={`${meongi.variable} ${mondangbunfil.variable} h-full antialiased`}
+      className={`${meongi.variable} ${monoplex.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-body">{children}</body>
     </html>
