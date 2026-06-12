@@ -81,7 +81,7 @@ export default function EditPage() {
         <h1 className="font-display text-4xl text-pop-pink drop-shadow-[3px_3px_0_var(--color-pop-ink)] tilt-left inline-block">
           DECORATE!
         </h1>
-        <p className="mt-2 text-base font-bold">아래 사진을 꾸민 뒤 완성을 눌러요</p>
+        <p className="mt-2 text-base font-bold">사진을 꾸며봐요! 저장하고 싶으면 완성을 눌러주세요♡</p>
       </header>
 
       <section className="mb-4 max-w-md mx-auto">
@@ -101,7 +101,7 @@ export default function EditPage() {
             download={`photobooth_${photoId.slice(0, 8)}.mp4`}
             className="chunky-btn bg-pop-sky text-pop-ink px-6 py-2.5 text-base inline-block"
           >
-            SAVE&nbsp;VIDEO
+            영상 저장하기
           </a>
           <p className="text-xs font-bold text-pop-ink/70 text-center max-w-xs">
             폰의 다운로드 폴더 (파일 앱) 에 저장돼요

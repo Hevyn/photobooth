@@ -30,6 +30,58 @@ export default function FabricEditor({ imageUrl }: Props) {
   const [penColor, setPenColor] = useState<string>(PEN_COLORS[0].value)
   const [savedDataURL, setSavedDataURL] = useState<string | null>(null)
 
+  // Undo/Redo — snapshot 스택 (canvas.toJSON 직렬화). loadFromJSON 이 async 라
+  // 적용 중에는 새 snapshot 안 쌓이게 isApplyingRef 가드.
+  const historyRef = useRef<string[]>([])
+  const historyIndexRef = useRef(-1)
+  const isApplyingRef = useRef(false)
+  const [canUndo, setCanUndo] = useState(false)
+  const [canRedo, setCanRedo] = useState(false)
+
+  const updateCanUndoRedo = () => {
+    setCanUndo(historyIndexRef.current > 0)
+    setCanRedo(historyIndexRef.current < historyRef.current.length - 1)
+  }
+
+  const pushHistory = () => {
+    const canvas = fabricRef.current
+    if (!canvas || isApplyingRef.current) return
+    const json = JSON.stringify(canvas.toJSON())
+    historyRef.current = historyRef.current.slice(0, historyIndexRef.current + 1)
+    historyRef.current.push(json)
+    if (historyRef.current.length > 50) historyRef.current.shift()
+    historyIndexRef.current = historyRef.current.length - 1
+    updateCanUndoRedo()
+  }
+
+  const applyHistory = async (index: number) => {
+    const canvas = fabricRef.current
+    if (!canvas) return
+    const json = historyRef.current[index]
+    if (!json) return
+    isApplyingRef.current = true
+    await canvas.loadFromJSON(JSON.parse(json))
+    // 배경 사진 ref 재설정 — selectable: false 인 image 객체
+    backgroundRef.current =
+      (canvas.getObjects().find(
+        (o) => o.type === 'image' && o.selectable === false,
+      ) as FabricImage | null) ?? null
+    canvas.renderAll()
+    historyIndexRef.current = index
+    updateCanUndoRedo()
+    isApplyingRef.current = false
+  }
+
+  const undo = () => {
+    if (historyIndexRef.current <= 0) return
+    void applyHistory(historyIndexRef.current - 1)
+  }
+
+  const redo = () => {
+    if (historyIndexRef.current >= historyRef.current.length - 1) return
+    void applyHistory(historyIndexRef.current + 1)
+  }
+
   // 캔버스 초기화 + 배경 사진 로드 (한 번만)
   // StrictMode dev 모드는 effect 를 두 번 호출 → fabricRef 가드로 1회 보장
   useEffect(() => {
@@ -87,7 +139,13 @@ export default function FabricEditor({ imageUrl }: Props) {
       canvas.sendObjectToBack(img)
       backgroundRef.current = img
       canvas.requestRenderAll()
+      // 배경만 있는 초기 상태를 history 의 첫 entry 로
+      pushHistory()
     })
+
+    // 펜 stroke 완료 + 스티커 transform 시 history push
+    canvas.on('path:created', () => pushHistory())
+    canvas.on('object:modified', () => pushHistory())
 
     // 의도적으로 cleanup 없음 — StrictMode dev 의 두 번 mount 패턴에서
     // 첫 cleanup 이 ref 를 비우면 두 번째 mount 에서 또 init 됨.
@@ -130,15 +188,7 @@ export default function FabricEditor({ imageUrl }: Props) {
     canvas.add(text)
     canvas.setActiveObject(text)
     canvas.requestRenderAll()
-  }
-
-  const deleteSelected = () => {
-    const canvas = fabricRef.current
-    if (!canvas) return
-    const active = canvas.getActiveObjects()
-    active.forEach((o) => canvas.remove(o))
-    canvas.discardActiveObject()
-    canvas.requestRenderAll()
+    pushHistory()
   }
 
   const clearAll = () => {
@@ -151,6 +201,7 @@ export default function FabricEditor({ imageUrl }: Props) {
       .forEach((o) => canvas.remove(o))
     canvas.discardActiveObject()
     canvas.requestRenderAll()
+    pushHistory()
   }
 
   // 캔버스 표시 사이즈(400) → 원본 사진 해상도(1440)로 export.
@@ -196,8 +247,10 @@ export default function FabricEditor({ imageUrl }: Props) {
 
       {savedDataURL ? (
         <>
-          <p className="text-base font-bold text-pop-ink">
-            위 사진을 길게 눌러 저장하세요
+          <p className="text-base font-bold text-pop-ink text-center leading-relaxed">
+            위 사진을 길게 눌러 저장해주세요♡
+            <br />
+            감사합니다 - 새우 -
           </p>
           <button
             onClick={() => setSavedDataURL(null)}
@@ -254,19 +307,14 @@ export default function FabricEditor({ imageUrl }: Props) {
         </div>
       )}
 
-      {/* 보조 버튼 */}
+      {/* 보조 버튼 — 이전 (UNDO) */}
       <div className="flex gap-2 mt-1">
         <button
-          onClick={deleteSelected}
-          className="chunky-btn bg-white text-pop-ink px-4 py-1.5 text-xs"
+          onClick={undo}
+          disabled={!canUndo}
+          className="chunky-btn bg-white text-pop-ink px-5 py-1.5 text-sm"
         >
-          선택 지우기
-        </button>
-        <button
-          onClick={clearAll}
-          className="chunky-btn bg-white text-pop-ink px-4 py-1.5 text-xs"
-        >
-          전체 초기화
+          이전
         </button>
       </div>
 
@@ -275,7 +323,7 @@ export default function FabricEditor({ imageUrl }: Props) {
         onClick={prepareSave}
         className="chunky-btn bg-pop-pink text-white px-8 py-3 text-xl mt-1"
       >
-        DONE!
+        완성
       </button>
       </>
       )}

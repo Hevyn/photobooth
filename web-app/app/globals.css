@@ -82,7 +82,8 @@ body {
   border: 3px solid var(--color-pop-ink);
   border-radius: 9999px;
   box-shadow: 4px 4px 0 0 var(--color-pop-ink);
-  font-family: var(--font-display), system-ui, sans-serif;
+  /* Bungee 가 latin only → 한글 char 는 Jua 로 fallback */
+  font-family: var(--font-display), var(--font-body), system-ui, sans-serif;
   letter-spacing: 0.02em;
   transition: transform 0.08s ease, box-shadow 0.08s ease;
 }

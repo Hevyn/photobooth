@@ -64,7 +64,8 @@ final class CameraSession: NSObject, ObservableObject {
     private var lastFramePresentationTime: CMTime = .zero
     private var currentResultContinuation: CheckedContinuation<CaptureResult, Error>?
     private var capturedPhoto: Data?
-    private weak var faceContainerNode: SCNNode?  // ARFaceAnchor 의 빈 컨테이너. 자식으로 face filter 부착
+    // ARFaceAnchor 별 빈 컨테이너. 자식으로 face filter 부착. 다중 얼굴 추적 지원
+    private var faceContainers: [UUID: SCNNode] = [:]
 
     // MARK: - Lifecycle
 
@@ -82,6 +83,8 @@ final class CameraSession: NSObject, ObservableObject {
         }
         let config = ARFaceTrackingConfiguration()
         config.isLightEstimationEnabled = true
+        // 기기 지원 한도까지 다중 얼굴 추적 (A12+ 면 최대 3명)
+        config.maximumNumberOfTrackedFaces = ARFaceTrackingConfiguration.supportedNumberOfTrackedFaces
         sceneView.session.run(config, options: [.resetTracking, .removeExistingAnchors])
     }
 
@@ -341,11 +344,20 @@ extension CameraSession: ARSCNViewDelegate {
         guard anchor is ARFaceAnchor else { return nil }
         // 빈 컨테이너 반환. activeFilter 변경 시 자식 노드 교체 (applyFaceFilter)
         let container = SCNNode()
+        let anchorID = anchor.identifier
         Task { @MainActor in
-            self.faceContainerNode = container
-            self.applyFaceFilter()
+            self.faceContainers[anchorID] = container
+            self.applyFaceFilterTo(node: container)
         }
         return container
+    }
+
+    nonisolated func renderer(_ renderer: SCNSceneRenderer, didRemove node: SCNNode, for anchor: ARAnchor) {
+        guard anchor is ARFaceAnchor else { return }
+        let anchorID = anchor.identifier
+        Task { @MainActor in
+            self.faceContainers.removeValue(forKey: anchorID)
+        }
     }
 }
 
@@ -353,10 +365,16 @@ extension CameraSession: ARSCNViewDelegate {
 
 extension CameraSession {
 
-    /// activeFilter 의 face 카테고리를 ARFaceAnchor 컨테이너에 부착/교체.
+    /// activeFilter 의 face 카테고리를 모든 ARFaceAnchor 컨테이너에 부착/교체.
     /// overlay 카테고리는 별도로 snapshot/tick 의 2D 합성에서 처리.
     private func applyFaceFilter() {
-        guard let container = faceContainerNode else { return }
+        for (_, container) in faceContainers {
+            applyFaceFilterTo(node: container)
+        }
+    }
+
+    /// 단일 컨테이너 노드에 현재 activeFilter 의 face 자산을 부착/교체.
+    private func applyFaceFilterTo(node container: SCNNode) {
         container.childNodes.forEach { $0.removeFromParentNode() }
         guard activeFilter.kind == .face,
               let assetName = activeFilter.assetName,
