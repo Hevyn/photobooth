@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { Canvas, FabricImage, IText, PencilBrush, Shadow } from 'fabric'
+import { Canvas, FabricImage, PencilBrush, Shadow } from 'fabric'
 
 type Mode = 'pen' | 'sticker'
 
@@ -19,7 +19,19 @@ const GLOW_COLORS = [
   { name: '그린', value: '#a8e063' },
 ]
 
-const STICKERS = ['✨', '🌸', '💖', '⭐', '🦋']
+// PNG 스티커 자산 — public/stickers/ 안에 위치
+const STICKERS = [
+  '/stickers/sticker1.png',
+  '/stickers/sticker2.png',
+  '/stickers/sticker3.png',
+  '/stickers/sticker4.png',
+  '/stickers/sticker5.png',
+  '/stickers/sticker6.png',
+  '/stickers/sticker7.png',
+  '/stickers/sticker8.png',
+]
+// 캔버스 좌표 기준 새 스티커 기본 너비 (PNG 비율에 따라 height 자동)
+const STICKER_BASE_WIDTH = 100
 
 type Props = {
   imageUrl: string
@@ -178,21 +190,28 @@ export default function FabricEditor({ imageUrl }: Props) {
     }
   }, [mode, glowColor])
 
-  const addSticker = (emoji: string) => {
+  const addSticker = async (assetPath: string) => {
     const canvas = fabricRef.current
     if (!canvas) return
-    const text = new IText(emoji, {
-      left: CANVAS_W / 2,
-      top: CANVAS_H / 2,
-      fontSize: 60,
-      originX: 'center',
-      originY: 'center',
-      editable: false,
-    })
-    canvas.add(text)
-    canvas.setActiveObject(text)
-    canvas.requestRenderAll()
-    pushHistory()
+    try {
+      const img = await FabricImage.fromURL(assetPath, { crossOrigin: 'anonymous' })
+      const naturalW = img.width ?? STICKER_BASE_WIDTH
+      const scale = STICKER_BASE_WIDTH / naturalW
+      img.set({
+        scaleX: scale,
+        scaleY: scale,
+        left: CANVAS_W / 2,
+        top: CANVAS_H / 2,
+        originX: 'center',
+        originY: 'center',
+      })
+      canvas.add(img)
+      canvas.setActiveObject(img)
+      canvas.requestRenderAll()
+      pushHistory()
+    } catch (e) {
+      console.error('[sticker] load failed:', e)
+    }
   }
 
   const clearAll = () => {
@@ -296,16 +315,17 @@ export default function FabricEditor({ imageUrl }: Props) {
         </div>
       )}
 
-      {/* 이모지 스티커 (기능은 이모지 그대로 유지) */}
+      {/* PNG 스티커 — 가로 스크롤 */}
       {mode === 'sticker' && (
-        <div className="flex gap-2">
-          {STICKERS.map((s) => (
+        <div className="flex gap-2 overflow-x-auto max-w-full px-1 pb-1">
+          {STICKERS.map((path) => (
             <button
-              key={s}
-              onClick={() => addSticker(s)}
-              className="w-12 h-12 text-2xl bg-white rounded-full border-[3px] border-pop-ink shadow-[2px_2px_0_0_var(--color-pop-ink)] hover:scale-110 transition"
+              key={path}
+              onClick={() => addSticker(path)}
+              className="shrink-0 w-12 h-12 bg-white rounded-lg border-[3px] border-pop-ink shadow-[2px_2px_0_0_var(--color-pop-ink)] hover:scale-110 transition flex items-center justify-center p-1"
             >
-              {s}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={path} alt="" className="max-w-full max-h-full object-contain" />
             </button>
           ))}
         </div>
