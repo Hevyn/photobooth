@@ -1,23 +1,23 @@
 import type { Metadata, Viewport } from "next";
-import { Bungee, Jua } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
+
+const meongi = localFont({
+  src: "../public/fonts/Cafe24Meongi.woff2",
+  variable: "--font-bungee",
+  display: "swap",
+});
+
+const ssurroundAir = localFont({
+  src: "../public/fonts/Cafe24SsurroundAir.woff2",
+  variable: "--font-jua",
+  display: "swap",
+});
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
 };
-
-const bungee = Bungee({
-  weight: "400",
-  subsets: ["latin"],
-  variable: "--font-bungee",
-});
-
-const jua = Jua({
-  weight: "400",
-  subsets: ["latin"],
-  variable: "--font-jua",
-});
 
 export const metadata: Metadata = {
   title: "PhotoBooth",
@@ -32,7 +32,7 @@ export default function RootLayout({
   return (
     <html
       lang="ko"
-      className={`${bungee.variable} ${jua.variable} h-full antialiased`}
+      className={`${meongi.variable} ${ssurroundAir.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-body">{children}</body>
     </html>
