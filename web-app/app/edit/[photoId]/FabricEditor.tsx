@@ -9,10 +9,14 @@ type Mode = 'pen' | 'sticker'
 const CANVAS_W = 400
 const CANVAS_H = 300
 
-const PEN_COLORS = [
+// 펜은 항상 흰색 코어 + 선택한 색의 글로우 (네온 광선 효과)
+const PEN_CORE = '#ffffff'
+const GLOW_COLORS = [
   { name: '핑크', value: '#ff70a6' },
   { name: '노랑', value: '#ffd166' },
-  { name: '하늘', value: '#7dd3fc' },
+  { name: '블루', value: '#5bc0eb' },
+  { name: '퍼플', value: '#b294f7' },
+  { name: '그린', value: '#a8e063' },
 ]
 
 const STICKERS = ['✨', '🌸', '💖', '⭐', '🦋']
@@ -27,7 +31,7 @@ export default function FabricEditor({ imageUrl }: Props) {
   const fabricRef = useRef<Canvas | null>(null)
   const backgroundRef = useRef<FabricImage | null>(null)
   const [mode, setMode] = useState<Mode>('pen')
-  const [penColor, setPenColor] = useState<string>(PEN_COLORS[0].value)
+  const [glowColor, setGlowColor] = useState<string>(GLOW_COLORS[0].value)
   const [savedDataURL, setSavedDataURL] = useState<string | null>(null)
 
   // Undo/Redo — snapshot 스택 (canvas.toJSON 직렬화). loadFromJSON 이 async 라
@@ -160,11 +164,11 @@ export default function FabricEditor({ imageUrl }: Props) {
     if (mode === 'pen') {
       canvas.isDrawingMode = true
       const brush = new PencilBrush(canvas)
-      brush.color = penColor
-      brush.width = 6
+      brush.color = PEN_CORE // 흰색 코어
+      brush.width = 5
       brush.shadow = new Shadow({
-        color: penColor,
-        blur: 14,
+        color: glowColor, // 글로우만 색
+        blur: 8, // 작은 blur — 진한 광선 효과
         offsetX: 0,
         offsetY: 0,
       })
@@ -172,7 +176,7 @@ export default function FabricEditor({ imageUrl }: Props) {
     } else {
       canvas.isDrawingMode = false
     }
-  }, [mode, penColor])
+  }, [mode, glowColor])
 
   const addSticker = (emoji: string) => {
     const canvas = fabricRef.current
@@ -271,19 +275,19 @@ export default function FabricEditor({ imageUrl }: Props) {
         </ToolBtn>
       </div>
 
-      {/* 펜 색 선택 */}
+      {/* 글로우 색 선택 (펜 코어는 항상 흰색) */}
       {mode === 'pen' && (
-        <div className="flex gap-3 items-center">
-          {PEN_COLORS.map((c) => (
+        <div className="flex gap-2 items-center">
+          {GLOW_COLORS.map((c) => (
             <button
               key={c.value}
-              onClick={() => setPenColor(c.value)}
+              onClick={() => setGlowColor(c.value)}
               aria-label={c.name}
-              className="w-10 h-10 rounded-full border-[3px] border-pop-ink transition"
+              className="w-9 h-9 rounded-full border-[3px] border-pop-ink transition"
               style={{
                 backgroundColor: c.value,
-                transform: penColor === c.value ? 'scale(1.15)' : 'scale(1)',
-                boxShadow: penColor === c.value
+                transform: glowColor === c.value ? 'scale(1.15)' : 'scale(1)',
+                boxShadow: glowColor === c.value
                   ? '2px 2px 0 0 var(--color-pop-ink)'
                   : '1px 1px 0 0 var(--color-pop-ink)',
               }}
