@@ -84,7 +84,11 @@ export default function EditPage() {
           alt="SAEWOO"
           className="w-48 md:w-56 h-auto tilt-left"
         />
-        <p className="mt-2 text-base font-bold">사진을 꾸며봐요! 저장하고 싶으면 완성을 눌러주세요♡</p>
+        <p className="mt-2 text-base font-bold leading-relaxed">
+          저와 추억을 쌓아주셔서 감사합니다.
+          <br />
+          사진을 저장하고 싶으시다면 완성 버튼을 눌러주세요♡
+        </p>
       </header>
 
       <section className="mb-4 max-w-md mx-auto">
@@ -107,13 +111,13 @@ export default function EditPage() {
             영상 저장하기
           </a>
           <p className="text-xs font-bold text-pop-ink/70 text-center max-w-xs">
-            폰의 다운로드 폴더 (파일 앱) 에 저장돼요
+            폰의 다운로드 폴더 (파일 앱) 에 저장됩니다.
           </p>
         </section>
       )}
 
       <footer className="mt-6 text-sm font-bold opacity-70 text-center pb-4">
-        사진과 QR 은 24시간 후 자동으로 삭제됩니다
+        사진과 QR 은 24시간 후 자동으로 삭제됩니다.
       </footer>
     </main>
   )

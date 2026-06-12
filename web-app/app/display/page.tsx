@@ -69,7 +69,7 @@ export default function DisplayPage() {
   const goNext = () => setCurrentIdx((i) => Math.max(0, i - 1))
 
   return (
-    <main className="bg-pattern-gingham min-h-dvh flex flex-col items-center justify-center p-6">
+    <main className="min-h-dvh flex flex-col items-center justify-center p-6">
       <header className="text-center mb-8 flex flex-col items-center">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img

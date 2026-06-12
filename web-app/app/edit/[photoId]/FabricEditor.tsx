@@ -307,14 +307,21 @@ export default function FabricEditor({ imageUrl }: Props) {
         </div>
       )}
 
-      {/* 보조 버튼 — 이전 (UNDO) */}
+      {/* 보조 버튼 — UNDO / REDO */}
       <div className="flex gap-2 mt-1">
         <button
           onClick={undo}
           disabled={!canUndo}
           className="chunky-btn bg-white text-pop-ink px-5 py-1.5 text-sm"
         >
-          이전
+          UNDO
+        </button>
+        <button
+          onClick={redo}
+          disabled={!canRedo}
+          className="chunky-btn bg-white text-pop-ink px-5 py-1.5 text-sm"
+        >
+          REDO
         </button>
       </div>
 
