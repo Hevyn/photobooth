@@ -2,12 +2,6 @@ import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 
-const meongi = localFont({
-  src: "../public/fonts/Cafe24MeongiB.woff2",
-  variable: "--font-bungee",
-  display: "swap",
-});
-
 const monoplex = localFont({
   src: "../public/fonts/MonoplexKR-Italic.ttf",
   variable: "--font-jua",
@@ -32,7 +26,7 @@ export default function RootLayout({
   return (
     <html
       lang="ko"
-      className={`${meongi.variable} ${monoplex.variable} h-full antialiased`}
+      className={`${monoplex.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-body">{children}</body>
     </html>

@@ -93,12 +93,12 @@ export default function DisplayPage() {
             <img
               src={current.image_url}
               alt="사진 미리보기"
-              className="rounded-2xl border-[3px] border-pop-ink shadow-[5px_5px_0_0_var(--color-pop-ink)] max-h-[60vh] object-contain tilt-right"
+              className="rounded-2xl border-[3px] border-pop-ink shadow-[2px_2px_0_0_var(--color-pop-ink)] max-h-[60vh] object-contain tilt-right"
             />
           </div>
 
           <div className="flex flex-col items-center gap-4">
-            <div className="bg-white p-4 rounded-2xl border-[3px] border-pop-ink shadow-[5px_5px_0_0_var(--color-pop-ink)] tilt-left">
+            <div className="bg-white p-4 rounded-2xl border-[3px] border-pop-ink shadow-[2px_2px_0_0_var(--color-pop-ink)] tilt-left">
               <QRCodeSVG
                 value={`${BASE_URL}/edit/${current.id}`}
                 size={240}

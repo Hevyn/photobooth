@@ -284,8 +284,8 @@ export default function FabricEditor({ imageUrl }: Props) {
                 backgroundColor: c.value,
                 transform: penColor === c.value ? 'scale(1.15)' : 'scale(1)',
                 boxShadow: penColor === c.value
-                  ? '3px 3px 0 0 var(--color-pop-ink)'
-                  : '2px 2px 0 0 var(--color-pop-ink)',
+                  ? '2px 2px 0 0 var(--color-pop-ink)'
+                  : '1px 1px 0 0 var(--color-pop-ink)',
               }}
             />
           ))}
@@ -299,7 +299,7 @@ export default function FabricEditor({ imageUrl }: Props) {
             <button
               key={s}
               onClick={() => addSticker(s)}
-              className="w-12 h-12 text-2xl bg-white rounded-full border-[3px] border-pop-ink shadow-[3px_3px_0_0_var(--color-pop-ink)] hover:scale-110 transition"
+              className="w-12 h-12 text-2xl bg-white rounded-full border-[3px] border-pop-ink shadow-[2px_2px_0_0_var(--color-pop-ink)] hover:scale-110 transition"
             >
               {s}
             </button>

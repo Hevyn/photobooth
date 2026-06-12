@@ -13,8 +13,8 @@
   --color-pop-cream: #fff8e0;
   --color-pop-ink: #1a1a1a;
 
-  /* 폰트 (next/font 가 layout.tsx 에서 주입) */
-  --font-display: var(--font-bungee);
+  /* 폰트 — 영문/한글 모두 MonoplexKR 단일 */
+  --font-display: var(--font-jua);
   --font-body: var(--font-jua);
 
   /* 의미별 alias (Tailwind utility 도 자동 생성) */
@@ -69,37 +69,36 @@ body {
 
 /* ───── 키치 컴포넌트 utility ────────────────────── */
 
-/* 스티커형 카드: 두꺼운 검정 보더 + chunky drop shadow */
+/* 스티커형 카드: 두꺼운 검정 보더 + 작은 drop shadow */
 .sticker-card {
   background: white;
   border: 3px solid var(--color-pop-ink);
   border-radius: 20px;
-  box-shadow: 6px 6px 0 0 var(--color-pop-ink);
+  box-shadow: 3px 3px 0 0 var(--color-pop-ink);
 }
 
-/* 둥근 알약 보더 버튼 (Y2K 둥근 두꺼운 보더 톤) */
+/* 둥근 알약 보더 버튼 */
 .chunky-btn {
   border: 3px solid var(--color-pop-ink);
   border-radius: 9999px;
-  box-shadow: 4px 4px 0 0 var(--color-pop-ink);
-  /* Bungee 가 latin only → 한글 char 는 Jua 로 fallback */
+  box-shadow: 2px 2px 0 0 var(--color-pop-ink);
   font-family: var(--font-display), var(--font-body), system-ui, sans-serif;
   letter-spacing: 0.02em;
   transition: transform 0.08s ease, box-shadow 0.08s ease;
 }
 .chunky-btn:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 6px 6px 0 0 var(--color-pop-ink);
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 0 var(--color-pop-ink);
 }
 .chunky-btn:active {
-  transform: translate(2px, 2px);
-  box-shadow: 1px 1px 0 0 var(--color-pop-ink);
+  transform: translate(1px, 1px);
+  box-shadow: 0 0 0 0 var(--color-pop-ink);
 }
 .chunky-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
   transform: none;
-  box-shadow: 4px 4px 0 0 var(--color-pop-ink);
+  box-shadow: 2px 2px 0 0 var(--color-pop-ink);
 }
 
 /* 살짝 기울어진 스티커 (붙인 느낌) */
