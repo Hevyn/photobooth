@@ -119,7 +119,7 @@ export default function DisplayPage() {
         </section>
       ) : loaded ? (
         <section className="sticker-card p-12 text-center">
-          <p className="font-display text-2xl text-pop-pink">FIRST&nbsp;SHOT!</p>
+          <p className="font-display text-2xl text-pop-apricot">FIRST&nbsp;SHOT!</p>
           <p className="font-bold mt-2">첫 촬영을 시작해보세요</p>
         </section>
       ) : null}
@@ -136,7 +136,7 @@ export default function DisplayPage() {
           <button
             onClick={goNext}
             disabled={currentIdx === 0}
-            className="chunky-btn bg-pop-pink text-white px-7 py-3 text-lg"
+            className="chunky-btn bg-pop-apricot text-pop-ink px-7 py-3 text-lg"
           >
             NEXT
           </button>

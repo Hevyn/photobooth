@@ -328,7 +328,7 @@ export default function FabricEditor({ imageUrl }: Props) {
       {/* 저장 준비 — 고해상도 dataURL 캡쳐 후 img 로 overlay */}
       <button
         onClick={prepareSave}
-        className="chunky-btn bg-pop-pink text-white px-8 py-3 text-xl mt-1"
+        className="chunky-btn bg-pop-apricot text-pop-ink px-8 py-3 text-xl mt-1"
       >
         완성
       </button>
@@ -351,7 +351,7 @@ function ToolBtn({
     <button
       onClick={onClick}
       className={`chunky-btn px-5 py-2 text-base ${
-        active ? 'bg-pop-pink text-white scale-105' : 'bg-white text-pop-ink'
+        active ? 'bg-pop-apricot text-pop-ink scale-105' : 'bg-white text-pop-ink'
       }`}
     >
       {children}

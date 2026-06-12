@@ -54,7 +54,7 @@ export default function EditPage() {
   if (status === 'not_found') {
     return (
       <Centered>
-        <h1 className="font-display text-3xl text-pop-pink mb-3 drop-shadow-[2px_2px_0_var(--color-pop-ink)]">
+        <h1 className="font-display text-3xl text-pop-apricot mb-3 drop-shadow-[2px_2px_0_var(--color-pop-ink)]">
           OOPS!
         </h1>
         <p className="text-lg font-bold">이 링크의 사진은 이미 사라졌어요</p>
@@ -66,7 +66,7 @@ export default function EditPage() {
   if (status === 'error') {
     return (
       <Centered>
-        <h1 className="font-display text-3xl text-pop-pink mb-3 drop-shadow-[2px_2px_0_var(--color-pop-ink)]">
+        <h1 className="font-display text-3xl text-pop-apricot mb-3 drop-shadow-[2px_2px_0_var(--color-pop-ink)]">
           TRY&nbsp;AGAIN
         </h1>
         <p className="text-lg font-bold">잠시 후 다시 시도해주세요</p>

@@ -1,17 +1,18 @@
 @import "tailwindcss";
 
 @theme inline {
-  /* Y2K 키치 팔레트 */
-  --color-pop-pink: #ff3d8d;
-  --color-pop-pink-soft: #ffc8dd;
-  --color-pop-yellow: #ffd400;
+  /* 파스텔 팔레트 — 로고 (E8FFFF / FF9F6E / 313131) 와 어울리게 */
+  --color-pop-pink: #ffc8dd;      /* 파스텔 핑크 */
+  --color-pop-pink-soft: #ffe1ec;
+  --color-pop-yellow: #ffe2a8;    /* 파스텔 노랑 */
   --color-pop-yellow-soft: #fff3a0;
-  --color-pop-sky: #5bc0eb;
-  --color-pop-sky-soft: #c5e9fd;
+  --color-pop-sky: #e8ffff;       /* 로고 배경과 동일 (연 민트) */
+  --color-pop-sky-soft: #f3ffff;
+  --color-pop-apricot: #ff9f6e;   /* 로고 포인트 (살구) — primary */
   --color-pop-red: #e63946;
   --color-pop-green: #a8e063;
   --color-pop-cream: #fff8e0;
-  --color-pop-ink: #1a1a1a;
+  --color-pop-ink: #313131;       /* 로고 검정 */
 
   /* 폰트 — 영문/한글 모두 MonoplexKR 단일 */
   --font-display: var(--font-jua);
